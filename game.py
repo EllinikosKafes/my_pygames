@@ -30,14 +30,14 @@ health = pygame.image.load("resources/images/health.png")
 gameover = pygame.image.load("resources/images/gameover.png")
 youwin = pygame.image.load("resources/images/youwin.png")
 # 3.1 - Load audio
-death = pygame.mixer.Sound("resources/audio/lego-yoda-death-sound-effect.mp3")
+death = pygame.mixer.Sound("resources/audio/explode.wav")
 hit = pygame.mixer.Sound("resources/audio/explode.wav")
 enemy = pygame.mixer.Sound("resources/audio/enemy.wav")
-shoot = pygame.mixer.Sound("resources/audio/awp-shoot-sound-effect-cs_go.mp3")
+shoot = pygame.mixer.Sound("resources/audio/shoot.wav")
 hit.set_volume(0.05)
 enemy.set_volume(0.05)
 shoot.set_volume(0.1)
-pygame.mixer.music.load('resources/audio/ussr-anthem-short2.mp3')
+pygame.mixer.music.load('resources/audio/moonlight.wav')
 pygame.mixer.music.play(-1, 0.0)
 pygame.mixer.music.set_volume(0.25)
 
@@ -56,6 +56,8 @@ while running:
     screen.blit(castle,(0,135))
     screen.blit(castle,(0,240))
     screen.blit(castle,(0,345 ))
+    screen.blit(castle,(0,450))
+    screen.blit(castle,(0,555))
     # 6.1 - Set player position and rotation
     position = pygame.mouse.get_pos()
     angle = math.atan2(position[1]-(playerpos[1]+32),position[0]-(playerpos[0]+26))
@@ -77,8 +79,9 @@ while running:
             screen.blit(arrow1, (projectile[1], projectile[2]))
     # 6.3 - Draw badgers
     if badtimer==0:
-        badguys.append([1280, random.randint(50,430)])
-        badtimer=100-(badtimer1*2)
+        for _ in range(2):
+            badguys.append([1280, random.randint(30,600)])
+            badtimer=100-(badtimer1*2)
         if badtimer1>=35:
             badtimer1=35
         else:
@@ -87,7 +90,7 @@ while running:
     for badguy in badguys:
         if badguy[0]<-64:
             badguys.pop(index)
-        badguy[0]-=1
+        badguy[0]-=1.5
         # 6.3.1 - Attack castle
         badrect=pygame.Rect(badguyimg.get_rect())
         badrect.top=badguy[1]
@@ -213,4 +216,3 @@ while 1:
             pygame.quit()
             exit(0)
     pygame.display.flip()
-
