@@ -193,18 +193,20 @@ if exitcode==0:
     pygame.mixer.music.stop()
     pygame.font.init()
     font = pygame.font.Font(None, 24)
-    text = font.render("Accuracy: "+str(accuracy)+"%", True, (255,0,0))
+    text = font.render("Accuracy: {:.1f}%".format(accuracy), True, (255,0,0))
     textRect = text.get_rect()
     textRect.centerx = screen.get_rect().centerx
     textRect.centery = screen.get_rect().centery+24
-    screen.blit(gameover, (0,0))
+    img_rect = gameover.get_rect()
+    img_rect.center = screen.get_rect().center 
+    screen.blit(gameover, img_rect)
     screen.blit(text, textRect)
     
 else:
     pygame.mixer.music.stop()
     pygame.font.init()
     font = pygame.font.Font(None, 24)
-    text = font.render("Accuracy: "+str(accuracy)+"%", True, (0,255,0))
+    text = font.render("Accuracy: {:.1f}%".format(accuracy), True, (255,0,0))
     textRect = text.get_rect()
     textRect.centerx = screen.get_rect().centerx
     textRect.centery = screen.get_rect().centery+24
