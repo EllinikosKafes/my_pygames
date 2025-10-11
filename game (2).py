@@ -4,18 +4,52 @@ from pygame.locals import *
 import math
 import random
 
+
+def pause():                                    #This is the pause function.Essentially it's a while loop that waits for the player to either press the pause button or press escape.
+    pause_start = pygame.time.get_ticks()
+    paused = True
+    while paused:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:   #if the player wants to exit the game , do it gracefully
+                pygame.quit()
+                quit()
+            elif event.type==MOUSEBUTTONDOWN: #here we check if the player presses the pause button to unpause
+                position = pygame.mouse.get_pos()
+                if (position[0] >= button[0]) and (position[0] <= button[0]+button[2]) and (position[1]>=button[1]) and (position[1]<=button[1]+button[3]):   #this lines checks if the mouse's position is inside the buttons rect(hitbox)
+                    paused = False
+            elif event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE: #if the presses escape again , unpause
+                paused = False  # resume
+                
+        screen.fill((50, 50, 50))   #fill the screen with gray
+        font = pygame.font.Font(None, 50)
+        text = font.render("PAUSED", True, (255, 255, 255))  #paused text
+        screen.blit(text, (140, 180))
+        button = pygame.draw.circle(screen, (255, 255, 255), (width-30, 30), 20)
+        pygame.draw.rect(screen, (0, 0, 0), (width-26, 18 ,7,25))
+        pygame.draw.rect(screen, (0, 0, 0), (width-42, 18 ,7,25))
+        pygame.display.flip()       #refresh the screen
+
+    
+    # return how long we were paused
+    pause_duration = pygame.time.get_ticks() - pause_start  # this is the total time that the player was paused
+    return pause_duration   #we return it to the main game loop so the timer doesn't keep on counting (we add the paused time to the remaining clicks)
+
 # 2 - Initialize the game
 pygame.init()
+clock = pygame.time.Clock()
 width, height = 1280, 720
 screen=pygame.display.set_mode((width, height))
 keys = [False, False, False, False]
 playerpos=[100,100]
 acc=[0,0]
 arrows=[]
+paused = False
 badtimer=100
 badtimer1=0
 badguys=[[1280,100]]
 healthvalue=256
+start_time = pygame.time.get_ticks()
+paused_time_total = 0
 pygame.mixer.init()
 
 # 3 - Load image
@@ -32,6 +66,7 @@ gameover = pygame.image.load("resources/images/gameover.png")
 gameover = pygame.transform.scale(gameover,(1280,720))
 youwin = pygame.image.load("resources/images/youwin.png")
 youwin = pygame.transform.scale(youwin,(1280,720))
+
 # 3.1 - Load audio
 death = pygame.mixer.Sound("resources/audio/explode.wav")
 hit = pygame.mixer.Sound("resources/audio/explode.wav")
@@ -51,6 +86,7 @@ while running:
     badtimer-=1
     # 5 - clear the screen before drawing it again
     screen.fill(0)
+    
     # 6 - draw the player on the screen at X:100, Y:100
     for x in range(int(width/grass.get_width())+1):
         for y in range(int(height/grass.get_height())+1):
@@ -61,6 +97,7 @@ while running:
     screen.blit(castle,(0,345 ))
     screen.blit(castle,(0,450))
     screen.blit(castle,(0,555))
+    
     # 6.1 - Set player position and rotation
     position = pygame.mouse.get_pos()
     angle = math.atan2(position[1]-(playerpos[1]+32),position[0]-(playerpos[0]+26))
@@ -93,7 +130,7 @@ while running:
     for badguy in badguys:
         if badguy[0]<-64:
             badguys.pop(index)
-        badguy[0]-=1.5
+        badguy[0]-=2
         # 6.3.1 - Attack castle
         badrect=pygame.Rect(badguyimg.get_rect())
         badrect.top=badguy[1]
@@ -119,7 +156,8 @@ while running:
     for badguy in badguys:
         screen.blit(badguyimg, badguy)
     # 6.4 - Draw clock
-    remaining_ms = 90000 - pygame.time.get_ticks()
+    
+    remaining_ms = 90000 - pygame.time.get_ticks() + paused_time_total
     minutes = remaining_ms // 60000
     seconds = (remaining_ms // 1000) % 60
     font = pygame.font.Font(None, 50)
@@ -131,6 +169,10 @@ while running:
     screen.blit(healthbar, (1000,690))
     for health1 in range(healthvalue):
         screen.blit(health, (health1+1004,693))
+    # 6.6 - Draw a pause button
+    button = pygame.draw.circle(screen, (255, 255, 255), (width-30, 30), 20)
+    pygame.draw.rect(screen, (0, 0, 0), (width-26, 18 ,7,25))
+    pygame.draw.rect(screen, (0, 0, 0), (width-42, 18 ,7,25))
     # 7 - update the screen
     pygame.display.flip()
     # 8 - loop through the events
@@ -158,7 +200,13 @@ while running:
                 keys[2]=False
             elif event.key==pygame.K_d:
                 keys[3]=False
+            elif event.key==pygame.K_ESCAPE:
+                paused_time_total += pause()
         if event.type==pygame.MOUSEBUTTONDOWN:
+            position = pygame.mouse.get_pos()
+            if (position[0] >= button[0]) and (position[0] <= button[0]+button[2]) and (position[1]>=button[1]) and (position[1]<=button[1]+button[3]):
+                paused_time_total += pause()
+                
             shoot.stop()
             shoot.play()
             position=pygame.mouse.get_pos()
@@ -180,7 +228,7 @@ while running:
             playerpos[0]+=5
 
     #10 - Win/Lose check
-    if pygame.time.get_ticks()>=90000:
+    if pygame.time.get_ticks()>=90000+paused_time_total:
         running=0
         exitcode=1
     if healthvalue<=0:
@@ -221,3 +269,4 @@ while 1:
             pygame.quit()
             exit(0)
     pygame.display.flip()
+    clock.tick(30)
