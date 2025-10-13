@@ -52,6 +52,41 @@ start_time = pygame.time.get_ticks()
 paused_time_total = 0
 pygame.mixer.init()
 
+# ----- LEVEL SELECTION SCREEN -----
+font = pygame.font.Font(None, 70)
+selecting = True
+level = 1  # default level
+
+while selecting:
+    screen.fill((30, 30, 30))  # dark background
+    title = font.render("CHOOSE LEVEL", True, (255, 255, 255))
+    screen.blit(title, (width // 2 - 200, height // 2 - 150))
+    
+    font_small = pygame.font.Font(None, 50)
+    screen.blit(font_small.render("1 - Level 1 (Easy)", True, (144,238,144)), (width // 2 - 150, height // 2 - 50))
+    screen.blit(font_small.render("2 - Level 2 (Normal)", True, (255,165,0)), (width // 2 - 150, height // 2))
+    screen.blit(font_small.render("3 - Level 3 (Hard)", True, (255,0,0)), (width // 2 - 150, height // 2 + 50))
+    
+    pygame.display.flip()  # update screen
+    
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:  # exit game
+            pygame.quit()
+            exit(0)
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_1:  # choose level 1
+                level = 1
+                selecting = False
+            elif event.key == pygame.K_2:  # choose level 2
+                level = 2
+                selecting = False
+            elif event.key == pygame.K_3:  # choose level 3
+                level = 3
+                selecting = False
+
+
+
+
 # 3 - Load image
 player = pygame.image.load("resources/images/dude.png")
 grass = pygame.image.load("resources/images/grass.png")
