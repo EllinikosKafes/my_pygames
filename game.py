@@ -106,12 +106,18 @@ while selecting:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_1:  # choose level 1
                 level = 1
+                badtimer=100
+                badtimer1+=5
                 selecting = False
             elif event.key == pygame.K_2:  # choose level 2
                 level = 2
+                badtimer=100
+                badtimer1=0
                 selecting = False
             elif event.key == pygame.K_3:  # choose level 3
                 level = 3
+                badtimer=100
+                badtimer1-=5
                 selecting = False
 
 
